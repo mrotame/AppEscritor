@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Escritor</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Materialize content -->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<script src="{{url_for('static',filename='materialize/js/jquery-3.4.1.min.js')}}"></script>
+	<script src="{{url_for('static',filename='materialize/js/materialize.js')}}"></script>
+	<script src="{{url_for('static',filename='mymaterial/js/dropdown.js')}}"></script>
+	<script src="{{url_for('static',filename='mymaterial/js/saveRequest.js')}}"></script>
+	<script src="{{url_for('static',filename='mymaterial/js/newBookRequest.js')}}"></script>
+	<script src="{{url_for('static',filename='mymaterial/js/capManager.js')}}"></script>
+	<script src="{{url_for('static',filename='mymaterial/js/openPage.js')}}"></script>
+	<script src="{{url_for('static',filename='mymaterial/js/shortcuts.js')}}"></script>
+	<link rel="stylesheet" href="{{url_for('static',filename='materialize/css/materialize.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='mymaterial/css/index.css')}}">
+</head>
+
+<body text="white">
+
+<main>
+	<!-- TopBar -->
+	<div class="row ">
+		<div class="row" style="margin-left:1%">
+		<!-- Arquivo dropdown -->
+		  <a class='dropdown-trigger btn' href='#' data-target="arquivo">Alterar arquivo</a>
+		  <ul id='arquivo' class='dropdown-content'>
+		    <li><a onClick="openBook()" href="#!">Abrir livro</a></li>
+		    <!-- Novo livro modal -->
+		    <li><a class="modal-trigger" href="#modalNovoLivro">Novo livro</a></li>	    
+		    <li><a onClick="saveBook()">Salvar livro</a></li>
+		    <li><a href="#!">Exportar livro</a></li>
+		    <li class="divider" tabindex="-1"></li>
+		  </ul>
+		  <!-- Editar dropdown --> 
+		 <!--  <a class='dropdown-trigger btn' href='#' data-target="editar">Editar livro</a>
+		  <ul id='editar' class='dropdown-content'>
+		    <li><a href="#!">aaaaaaaaaaaaaaa</a></li>
+		    <li><a href="#!">two</a></li>
+		    <li class="divider" tabindex="-1"></li>
+		    <li><a href="#!">three</a></li>
+		    <li><a href="#!"><i class="material-icons">cloud</i>five</a></li>
+		  </ul> -->
+
+		  <!-- Ajuda dropdown -->
+		  <a class='dropdown-trigger btn' href='#' data-target="ajuda">Ajuda</a>
+		  <ul id='ajuda' class='dropdown-content'>
+		    <li><a href="#modalHelp" class="modal-trigger">Socorro</a></li>
+		    <li class="divider" tabindex="-1"></li>
+		    <li><a href="#modalAbout" class="modal-trigger">Sobre</a></li>
+		  </ul>
+
+		</div>
+	</div>
+
+	<div class="row">
+				Livro:<h4 id="book-name"></h4>
+			</div>
+
+	<!--Normal content-->
+	<div class="row flex">
+
+		<!-- SideBar -->
+		<div class="col s0 m3 l2 hide-on-small-only "> <!-- sidebar hide on mobile -->
+			<!-- Nome do livro -->
+
+			<!-- Titulo da sidebar -->
+			<div class="row">
+				<h5>Capitulos</h5>
+			</div>
+			<!--  Botões do capitulo -->
+			<div class="row">
+				<!-- Botão de adicionar capitulo -->
+				<a href="#!" onClick=" addCap()" class="waves-effect waves-light btn blue darken-3"><i class="material-icons">add</i></a>
+
+				<!-- Botão de editar capitulo -->
+				<!-- <a href="#!" onClick="alterCap()" class="waves-effect green-light green btn"><i class="material-icons">border_color</i></a> -->
+
+				<!-- Botão de Remover capitulo -->
+				<a href="#!" onClick="removeCap()" class="waves-effect red-light red btn"><i class="material-icons">remove</i></a>
+
+				
+			</div>
+
+			<!-- Capitulos da sidebar -->
+			<div class="row" id="capList">
+				
+
+			</div>
+
+		</div>
+
+		<!-- Escrever -->
+		<div class="col s12 m9 l10"> 
+			<div class="col s1 m0 l0 blue push-s10 row hide-on-med-and-up" > 1 </div> 
+			
+			<!-- Titulo do capitulo -->
+			<div class="col s12">
+					<input class="title-text" id="capTitle" type="text" data-length="10">
+         		    <label for="input_text">Titulo do capitulo</label>
+			</div>
+			<!-- Texto do capitulo -->
+			<div class="col s11">
+				<textarea id="capContent" class="materialize-textarea" text="white"></textarea>
+			</div>
+		</div>
+
+	</div>
+
+</main>
+
+	<footer class="page-footer">
+		<div class="container">
+			<div class="row">
+				<div class="col s12"> Rodapé aqui. </div>
+			</div>
+		</div>
+	</footer>
+
+	<!-- Modal para criar novo livro -->
+	<div id="modalNovoLivro" class="modal">
+	    <div class="modal-content">
+	      <h4>Criar novo livro</h4>
+	       <div class="input-field col s6">
+	          <input id="nomeLivro" type="text" class="validate white-text">
+	          <label for="nomeLivro" class="white-text">Nome do livro</label>
+        	</div>
+	    </div>
+	    <div class="modal-footer">
+	    	<a id="errorResult"></a>
+	      <a onClick="newBookRequest()" href="#!" class=" white-text waves-effect waves-green btn-flat">Criar livro</a>
+	    </div>
+	</div>
+
+	<!-- Modal para abrir um livro já existente -->
+	<div id="modalOpenBook" class="modal">
+	    <div class="modal-content">
+	      <h4>Abrir livro</h4>
+	       <div class="input-field col s6">
+	          <p class='white-text'>Selecione o livro que deseja abrir</p>
+
+	            <ul class="collection" id="bookList">
+    			</ul>
+
+        	</div>
+	    </div>
+	   <!--  <div class="modal-footer">
+	    	<a id="errorResult"></a>
+	      <a onClick="newBookRequest()" href="#!" class=" white-text waves-effect waves-green btn-flat">Abrir livro</a>
+	    </div> -->
+	</div>
+
+	<!-- Modal de ajuda -->
+	<div id="modalHelp" class="modal">
+	    <div class="modal-content">
+	      <h4>Socorro</h4><br>
+	       <div class="input-field col s6">
+	          <p class='white-text'>Para pedir ajuda ou requisitar mudanças de software, olhe para o lado.</p>
+
+        	</div>
+	    </div>
+	   <div class="modal-footer">
+	    	<a id="errorResult"></a>
+	      <a onClick="newBookRequest()" href="#!" class="modal-close white-text waves-effect waves-green btn-flat">Fechar</a>
+	    </div>
+	</div>
+
+	<!-- Modal sobre -->
+	<div id="modalAbout" class="modal">
+	    <div class="modal-content">
+	      <h4>Sobre</h4><br>
+	       <div class="input-field col s6">
+	          <p class='white-text'>Nome: Software escritor</p>
+	          <p class='white-text'>Descrição: Software Para escrever livros</p>
+	          <p class='white-text'>Versão: 0.1</p>
+
+        	</div>
+	    </div>
+	    <div class="modal-footer">
+	    	<a id="errorResult"></a>
+	      <a onClick="newBookRequest()" href="#!" class="modal-close white-text waves-effect waves-green btn-flat">Fechar</a>
+	    </div>
+	</div>
+
+</body>
+	
+</html>

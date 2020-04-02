@@ -1,0 +1,60 @@
+ body {
+    display: flex;
+    min-height: 80vh;
+    flex-direction: column;
+    background-color: #212121;
+    margin-left:20px;
+    margin-top:10px;
+  }
+
+  main {
+    flex: 1 0 auto;
+  }
+
+.dropdown-content {
+   overflow-y: visible;
+}
+.dark-bg {
+  background-color: #212121 !important;
+}
+
+.dropdown-content .dropdown-content {
+   margin-left: 100%;
+}
+
+.white-text{
+  color:white !important;
+}
+
+.modal {
+  background-color: #212121 !important;
+}
+.modal-footer {
+  background-color: #212121 !important;
+}
+
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 80vh;  /*or use calc(100vh - header_height)*/
+}
+
+.title-text{
+	color: #90caf9 !important;
+	font-size: 200% !important;
+}
+
+.white-text {
+  color: white !important;
+}
+
+textarea {
+color:white !important;
+/*min-width: 50px;*/
+}
+footer{
+position: fixed;
+right: 0;
+left: 0;
+bottom: 0;
+}
