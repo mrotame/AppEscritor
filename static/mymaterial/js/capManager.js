@@ -10,109 +10,88 @@ function addCap(prename='') {
 		capName = prename
 		capNum = ""
 	} else {
-		capName = "capítulo"
+		capName = "Novo capítulo"
 	}
-	
-	// Verifica a contagem de numer ode capitulos para inserir o numero correto no nome do capitulo
-	if (prename == '') {
-		while (true){
-			var actualNum = capNum
-			for(var i in capitulos) {
-				if (capitulos[i][0] == capName+" "+capNum){
-					capNum += 1
-				}
-			}
-			if (actualNum == capNum) {
-				break
-			}
-		}
-	}
-
-	capitulos[totalCapnum] = [capName+" "+capNum,""]
+	capitulos[totalCapnum] = [capName,{}]
 	newCap = true
 	totalCapnum += 1
-
-	if (prename != "" && capNum == 1) {
-		capNum = ""
-	}
 	// Insere o html com a devida formatação
 	if(newCap == true){
 		var element = document.getElementById('capList');
-		element.innerHTML = element.innerHTML+"<a href='#!' onClick='changeCap("+(totalCapnum-1)+",capAtual)' id='cap"+totalCapnum.toString()+"'>"+capName+" "+capNum+"<br></a>"
+		element.innerHTML = element.innerHTML+`
+		<div id="div-cap`+totalCapnum+`">
+		<a href="#!" onClick="deleteCap(`+totalCapnum+`)" class="waves-effect btn-tiny">
+		<i style="color:#c62828" class="tiny material-icons">delete_forever</i>
+	</a> 
+	<a href="#!" onClick="alterCap(`+totalCapnum+`)" class="waves-effect btn-tiny">
+		<i style="color:#4caf50" class="tiny material-icons">border_color</i>
+	</a> 
+	&nbsp;&nbsp; 
+	<a href="#!" onClick='changeCap(`+(totalCapnum-1)+`)' id='cap`+totalCapnum.toString()+`'>`+capName+`</a>
+	<br>
+	</div>`
 	}
 	
-	console.log(capNum)
+	//console.log(capNum)
 	console.log("capitulo "+capName+capNum+" criado")
+	changeCap((totalCapnum-1),	capAtual)
 }
 
-function removeCap(capname) {
+function deleteCap(capName) {
+	$('#modalDeleteCapitulo').modal('open');
+	window.toDelete = capName
+}
+function removeCap(capName) {
+	
+	if (capName === 'last') {
+		// Deleta o capitulo
+		delete capitulos[totalCapnum-1];
+		totalCapnum -= 1
+		// Remove do html 
+		var elem = document.getElementById('div-cap'+totalCapnum.toString());
+		elem.parentNode.removeChild(elem);
+		return true
+	}
+	capName = window.toDelete
+	console.log(capName)
+	// Deleta o capitulo
+	delete capitulos[capName-1];
+	totalCapnum -= 1
 	// Remove do html 
-	var elem = document.getElementById('cap'+totalCapnum.toString());
+	
+	var elem = document.getElementById('div-cap'+(capName).toString());
     elem.parentNode.removeChild(elem);
 
     // Altera o capitulo se o deletado estiver selecionado
     if (capAtual == totalCapnum-1) {
     	changeCap(capAtual-1)
     }
-    // Deleta o capitulo
-	delete capitulos[totalCapnum-1];
-	totalCapnum -= 1
-
-
-
-	console.log("capitulo "+capname+" removido")
-	return false
-}
-
-function alterCap(oldname,newname,content) {
-	console.log("capitulo "+oldname+" alterado")
-}
-
-function changeCap(newCap,oldCap='sabado'){
-	console.log(newCap,oldCap)	
-	if (oldCap == 'sabado') {
-		console.log('if')
-		capAtual = newCap
-		document.getElementById('capTitle').value = capitulos[newCap][0]
-		document.getElementById('capContent').value = capitulos[newCap][1]
-
-	}else {
-		console.log('else')
-		console.log(document.getElementById('capTitle').value)
-		console.log(document.getElementById('capContent').value)
-		
-		capitulos[oldCap] = [
-		document.getElementById('capTitle').value,
-		document.getElementById('capContent').value
-		]
-		document.getElementById('capTitle').value = capitulos[newCap][0]
-		document.getElementById('capContent').value = capitulos[newCap][1]
-		
-		capAtual = newCap
-		console.log('capAtual = '+capAtual)
-	}
-}
-
-window.addEventListener('click', function(e){   
-  if (document.getElementById('capTitle').contains(e.target)){
-    console.log('dentro do titulo')
-  } else{
-  	// if( totalCapnum >= 5) {
-	    console.log("fora do titulo");
-	    capToChangeName = capAtual+1
-	    old = document.getElementById('cap'+capToChangeName.toString()).innerHTML;
-	    newOne = document.getElementById('capTitle').value;
-	    console.log(old)
-	    console.log(newOne)	
-	    if (old != newOne) {
-	    	if (newOne == "") {
-	    		document.getElementById('cap'+capToChangeName.toString()).innerHTML = "Novo capitulo<br>";
-	    	} else{
-	    		document.getElementById('cap'+capToChangeName.toString()).innerHTML = document.getElementById('capTitle').value+"<br>";
-	    	}
-	    }
-	}
     
-  // }
-});
+	console.log("capitulo "+capName+" removido")
+	$('#modalDeleteCapitulo').modal('close');
+	return true
+}
+
+function alterCap(capNum) {
+	console.log("Alterando capNum:",capNum)
+	window.editing = capNum
+	obj = $('#cap'+(window.editing).toString()).html()
+	console.log("obj:",obj)
+
+	$("#modalAlterarCapitulo > .modal-content > .input-field > #capName").val(obj)
+	$('#modalAlterarCapitulo').modal('open');
+}
+function alterCapName() {
+	let capNum = window.editing
+	let newName = $("#modalAlterarCapitulo > .modal-content > .input-field > #capName").val()
+	let toChange = 	$('#cap'+(capNum).toString())
+	capitulos[capNum-1][0] = newName
+	$('#cap'+(capNum).toString()).html(newName)
+	$('#modalAlterarCapitulo').modal('close');
+}
+
+function changeCap(newCap){
+	
+}
+// Muda o titulo do capitulo ao clicar fora dele
 

@@ -2,6 +2,8 @@
 function openBook() {
 	var bookList = []
 	getBookList();
+	$('#textarea1').val('New Text');
+	M.textareaAutoResize($('#capContent'));
 }
 
 function openIt(bookToOpen) {

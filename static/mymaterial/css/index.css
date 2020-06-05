@@ -22,6 +22,26 @@
    margin-left: 100%;
 }
 
+#capList {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color:#0398dd;
+  font-size:16px;
+}
+
+#sesList {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color:#0398dd;
+  font-size:14px;
+}
+
+.offset {
+  margin-right: 2.5%;
+}
+
 .white-text{
   color:white !important;
 }
