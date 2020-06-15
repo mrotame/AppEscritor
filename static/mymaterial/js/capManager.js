@@ -1,6 +1,13 @@
-var capitulos = {};
+setInterval(visibleSideBar,100)
+window.capitulos = {};
 var totalCapnum = 0;
 var capAtual = undefined;
+var selectedCap = undefined
+
+var paintedCap = undefined
+var paintedSes = undefined
+setInterval(selectionCss,10)
+
 
 function addCap(prename='') {
 	var newCap = false;
@@ -10,109 +17,180 @@ function addCap(prename='') {
 		capName = prename
 		capNum = ""
 	} else {
-		capName = "capítulo"
+		capName = "Novo capítulo"
 	}
-	
-	// Verifica a contagem de numer ode capitulos para inserir o numero correto no nome do capitulo
-	if (prename == '') {
-		while (true){
-			var actualNum = capNum
-			for(var i in capitulos) {
-				if (capitulos[i][0] == capName+" "+capNum){
-					capNum += 1
-				}
-			}
-			if (actualNum == capNum) {
-				break
-			}
-		}
-	}
-
-	capitulos[totalCapnum] = [capName+" "+capNum,""]
+	window.capitulos[totalCapnum] = {'nome':capName,'conteudo':{}}
 	newCap = true
 	totalCapnum += 1
-
-	if (prename != "" && capNum == 1) {
-		capNum = ""
-	}
 	// Insere o html com a devida formatação
 	if(newCap == true){
 		var element = document.getElementById('capList');
-		element.innerHTML = element.innerHTML+"<a href='#!' onClick='changeCap("+(totalCapnum-1)+",capAtual)' id='cap"+totalCapnum.toString()+"'>"+capName+" "+capNum+"<br></a>"
+		element.innerHTML = element.innerHTML+`
+		<div id="div-cap`+totalCapnum+`">
+		<p id="overflowed">
+				<a href="#!" onClick="deleteCap(`+totalCapnum+`)" class="waves-effect btn-tiny">
+					<i style="color:#c62828" class="tiny material-icons">delete_forever</i>
+				</a> 
+				<a href="#!" onClick="alterCap(`+totalCapnum+`)" class="waves-effect btn-tiny">
+					<i style="color:#4caf50" class="tiny material-icons">border_color</i>
+				</a> 
+			<a href="#!" onClick='selectCap(`+(totalCapnum-1)+`)' class="title" id='overflowed cap`+totalCapnum.toString()+`'>`+capName+`</a>
+		</p>
+		<br>
+		</div>`
+	selectCap(totalCapnum-1)
 	}
 	
-	console.log(capNum)
+	//console.log(capNum)
 	console.log("capitulo "+capName+capNum+" criado")
+	//selectCap((totalCapnum-1),	capAtual)
 }
 
-function removeCap(capname) {
-	// Remove do html 
-	var elem = document.getElementById('cap'+totalCapnum.toString());
-    elem.parentNode.removeChild(elem);
-
-    // Altera o capitulo se o deletado estiver selecionado
-    if (capAtual == totalCapnum-1) {
-    	changeCap(capAtual-1)
-    }
-    // Deleta o capitulo
-	delete capitulos[totalCapnum-1];
-	totalCapnum -= 1
-
-
-
-	console.log("capitulo "+capname+" removido")
-	return false
+function deleteCap(capName) {
+	$('#modalDeleteCapitulo').modal('open');
+	window.toDelete = capName
 }
+function removeCap(capName) {
+	if (totalCapnum >= 1){
+		toDelCap = selectedCap
+		if (selectedCap == totalCapnum-1) {
+			selectCap(selectedCap-1)
+			selectSes(0);
+		}
+		if (capName === 'last') {
+			// Altera o capitulo se o deletado estiver selecionado
 
-function alterCap(oldname,newname,content) {
-	console.log("capitulo "+oldname+" alterado")
-}
+			// Deleta o capitulo
+			delete window.capitulos[totalCapnum-1];	
+			// Remove do html 
+			var elem = document.getElementById('div-cap'+totalCapnum.toString());
+			elem.parentNode.removeChild(elem);
+			totalCapnum -= 1
+			return true
+		} else {
+			capName = window.toDelete
+			console.log(capName)
+			// Deleta o capitulo
+			delete window.capitulos[capName-1];
+			totalCapnum -= 1
+			// Remove do html 
+			
+			var elem = document.getElementById('div-cap'+(capName).toString());
+			elem.parentNode.removeChild(elem);
 
-function changeCap(newCap,oldCap='sabado'){
-	console.log(newCap,oldCap)	
-	if (oldCap == 'sabado') {
-		console.log('if')
-		capAtual = newCap
-		document.getElementById('capTitle').value = capitulos[newCap][0]
-		document.getElementById('capContent').value = capitulos[newCap][1]
-
-	}else {
-		console.log('else')
-		console.log(document.getElementById('capTitle').value)
-		console.log(document.getElementById('capContent').value)
-		
-		capitulos[oldCap] = [
-		document.getElementById('capTitle').value,
-		document.getElementById('capContent').value
-		]
-		document.getElementById('capTitle').value = capitulos[newCap][0]
-		document.getElementById('capContent').value = capitulos[newCap][1]
-		
-		capAtual = newCap
-		console.log('capAtual = '+capAtual)
+			console.log("capitulo "+capName+" removido")
+			$('#modalDeleteCapitulo').modal('close');
+			return true
+		}
 	}
 }
 
-window.addEventListener('click', function(e){   
-  if (document.getElementById('capTitle').contains(e.target)){
-    console.log('dentro do titulo')
-  } else{
-  	// if( totalCapnum >= 5) {
-	    console.log("fora do titulo");
-	    capToChangeName = capAtual+1
-	    old = document.getElementById('cap'+capToChangeName.toString()).innerHTML;
-	    newOne = document.getElementById('capTitle').value;
-	    console.log(old)
-	    console.log(newOne)	
-	    if (old != newOne) {
-	    	if (newOne == "") {
-	    		document.getElementById('cap'+capToChangeName.toString()).innerHTML = "Novo capitulo<br>";
-	    	} else{
-	    		document.getElementById('cap'+capToChangeName.toString()).innerHTML = document.getElementById('capTitle').value+"<br>";
-	    	}
-	    }
-	}
-    
-  // }
-});
+function alterCap(capNum) {
+	console.log("Alterando capNum:",capNum)
+	window.editing = capNum
+	obj = $('#div-cap'+(window.editing).toString() +'> #overflowed > .title').html()
+	console.log("obj:",obj)
 
+	$("#modalAlterarCapitulo > .modal-content > .input-field > #capName").val(obj)
+	$('#modalAlterarCapitulo').modal('open');
+}
+function alterCapName() {
+	let capNum = window.editing
+	let newName = $("#modalAlterarCapitulo > .modal-content > .input-field > #capName").val()
+	if (newName == ""){
+		newName = "Novo capítulo"
+	} 
+	//let toChange = 	$('#cap'+(capNum).toString() )
+	window.capitulos[capNum-1]['nome'] = newName
+	$('#div-cap'+(window.editing).toString() +'> #overflowed > .title').html(newName)
+	$('#modalAlterarCapitulo').modal('close');
+}
+
+function selectCap(capNum){
+	window.selectedCap = capNum
+	window.totalsesnum = Object.keys(capitulos[capNum]['conteudo']).length
+	if (window.totalsesnum === undefined){window.totalsesnum = 0}
+	htmlList = ''
+	console.log(window.totalsesnum)
+	for(i=0; i < window.totalsesnum; i++) {
+		
+		htmlList += `
+		<div id='div-ses-root`+(i)+`'>
+			<div onClick='selectSes(`+i+`,window.sesAtual)' id='div-ses`+(i).toString()+`'>
+				<a href="#!" >
+					<p id='overflowed'>
+					`+capitulos[capNum]['conteudo'][i]['nome']+`
+					</p>
+				</a>
+			</div>
+			<br>
+		</div>`
+	}
+	var element = document.getElementById('sesList');
+	element.innerHTML = htmlList
+	//selectSes(0,window.sesAtual, capNum)
+	if (window.totalsesnum === 0) {
+		console.log("if")
+		document.getElementById('sesTitle').value = ""
+		document.getElementById('sesContent').value = ""
+		sesAtual = undefined
+	} else {
+		selectFirstSes(window.selectedCap,sesAtual,capNum,0)
+		sesAtual = 0
+	}
+	
+}
+
+function selectFirstSes(oldcap, oldses,newcap ,newses) {
+	newcap = capitulos[newcap];
+	console.log(newses)
+
+	// Muda para sessão nova
+	//document.getElementById('ses'+(oldses+1).toString()).innerHTML = document.getElementById('sesTitle').value+``,
+	document.getElementById('sesTitle').value = newcap['conteudo'][newses]['nome']
+	document.getElementById('sesContent').value = newcap['conteudo'][newses]['texto']
+	M.textareaAutoResize($('#sesContent'));
+}
+
+function selectionCss() {
+	// verifica os capitulos
+	if(paintedCap !== selectedCap) {
+		// Tira o background se não selecionado
+		if (paintedCap !== undefined) {
+			let oldElem = document.getElementById('div-cap'+(paintedCap+1).toString())
+			if(oldElem != null){oldElem.style.backgroundColor = ''}
+		}
+		let newElem = document.getElementById('div-cap'+(selectedCap+1).toString())
+		newElem.style.backgroundColor = '#424242'
+		//elem.style.backgroundColor= 'red'
+		paintedCap = selectedCap
+	}
+
+	// pinta as sessões
+	// Tira o background se não selecionado
+	if (paintedSes !== undefined) {
+		let oldElem = document.getElementById('div-ses'+(paintedSes).toString())
+		if(oldElem != null){oldElem.style.backgroundColor = ''}
+	}
+	if (sesAtual !== undefined) {
+		let newElem = document.getElementById('div-ses'+(sesAtual).toString())
+		newElem.style.backgroundColor = '#424242'
+		paintedSes = sesAtual
+	}
+
+}
+
+function visibleSideBar() {
+	if (window.openedBook === undefined) {
+		document.getElementById('sessionLine').style.visibility = 'hidden';
+		document.getElementById('capLine').style.visibility = 'hidden';
+		document.getElementById('bookTitle').style.visibility = 'hidden';
+		document.getElementById('initialTitle').style.display = 'block';
+	} else {
+		document.getElementById('sessionLine').style.visibility = 'visible';
+		document.getElementById('capLine').style.visibility = 'visible';
+		document.getElementById('bookTitle').style.visibility = 'visible';
+		document.getElementById('initialTitle').style.display = 'none';
+	}
+
+}

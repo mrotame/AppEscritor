@@ -1,7 +1,7 @@
 from flask import Flask, Blueprint, request, jsonify, json
-import os.path
+import os.path, json, glob, shutil
 
-savelocation = "/books"
+saveLocation = "./books/"
 save_page = Blueprint('savepage',__name__)
 
 @save_page.route('/savepage', methods=['POST'])
@@ -12,15 +12,36 @@ def show():
 		print('hey, undefined')
 		return jsonify('Error undefined'),201
 
-	book_path = "./books/"+content['bookName']+'/'
+	book_path = saveLocation+content['bookName']+'/'
+
+	# Clear folder
+	try:
+		shutil.rmtree(book_path)
+	except FileNotFoundError:
+		pass
+	os.mkdir(saveLocation+content['bookName'])
+	# Create chapters folders
 	capNums = 0
-	print(content)
+	
 	for item in content['capitulos']:
-		print(content['capitulos'][item])
+		chapterFolder = saveLocation+content['bookName']+'/'+str(capNums)+"-"+content['capitulos'][item]['nome']
+		os.mkdir(chapterFolder)
+
+		for ses in content['capitulos'][item]['conteudo']:
+			file = open(chapterFolder+'/'+ses+'-'+content['capitulos'][item]['conteudo'][ses]['nome']+'.txt','w')
+			file.write(content['capitulos'][item]['conteudo'][ses]['texto'])
+			file.close()
 		capNums += 1
-		file = open(book_path+item+'.txt','w')
-		file.write('''%s*--__--*'''%(content['capitulos'][item][0]))
+	'''
+	sesNums = 0
+	Create sessions
+		#print(content['capitulos'][item])
+		file = open(book_path+item+" - "+content['capitulos'][item][0]+'.txt','w')
+		file.write(''%s*--__--*'%(content['capitulos'][item][0]))
 		file.write('%s'%(content['capitulos'][item][1]))
 		file.close()
+		sesNums += 1
+	'''
+	return jsonify({'result':'success'}),201
 
-	return jsonify(newdata),201
+	

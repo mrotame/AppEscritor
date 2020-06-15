@@ -18,14 +18,24 @@ def show():
 		content = request.get_json()
 		print(content)
 		res = os.walk(book_path+content)
+		book = {'Nome':content,'capitulos':[]}
+
+		c = 0
 		for item in res:
-			res = item[2]
-			break
-		count = 0
-		for item in res:
-			file = open(book_path+content+'/'+item,"r")
-			tmp = file.read()
-			tmp = tmp.split('*--__--*')
-			files[count]= [tmp[0],tmp[1]]
-			count += 1
-		return jsonify(files),201
+			print(item)
+			if c == 0:
+				for name in item[1]:
+					temp = name.split('-')
+					book['capitulos'].append({'nome':temp[1],'conteudo':[]})
+			else:
+				for txt in item[2]:
+					file = open(item[0]+'/'+txt)
+					name = ((os.path.basename(file.name)).split('-')[1]).split('.')[0]
+					print(name)
+					print(c)
+					book['capitulos'][c-1]['conteudo'].append({'nome':name, 'texto':file.read()})
+
+			c += 1
+		print(book)
+
+		return jsonify(book),201

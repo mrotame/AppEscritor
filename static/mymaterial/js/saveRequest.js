@@ -1,9 +1,11 @@
+done = undefined
+setInterval(autoSave,2000)
+
+$("#autoSaveCheckBoxInput").click(function () {
+    return false;
+});
+
 function saveBook(){
-	// inclui o capitulo atual na variavel de todos os capitulos
-	capitulos[capAtual] = [
-		document.getElementById('capTitle').value,
-		document.getElementById('capContent').value
-		]
 
 	var book = {
 		'bookName': document.getElementById('book-name').innerHTML,
@@ -21,9 +23,28 @@ function saveBook(){
 	.done(function(result){     // on success get the return object from server
 	    console.log(result)     // do whatever with it. In this case see it in console
 	    if (result=='Error undefined') {
-	    	alert('Erro: Nenhum livro aberto')
+	    	//alert('Erro: Nenhum livro aberto')
 	    } else {
-	    	alert('Livro salvo com sucesso')
+	    	//alert('Livro salvo com sucesso')
 	    }
 	})
+}
+
+function autoSave() {
+	try{
+		checkBox = (localStorage.getItem('autoSaveCheckBox')=== "true")
+		document.getElementById('autoSaveCheckBoxInput').checked = checkBox
+	} catch{
+		checkBox = false;
+	}
+	if (localStorage.getItem('autoSaveCheckBox') == "true" && window.openedBook !== undefined) {
+		saveBook()
+	} else {
+	}
+
+}
+
+function autoSaveCheckBox(){
+	document.getElementById('autoSaveCheckBoxInput').checked = !document.getElementById('autoSaveCheckBoxInput').checked
+	localStorage.setItem('autoSaveCheckBox',document.getElementById('autoSaveCheckBoxInput').checked)
 }

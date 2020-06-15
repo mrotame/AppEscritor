@@ -1,3 +1,5 @@
+setInterval(openModalDetection,500)
+
 function newBookRequest() {
 	var book = {
 		'bookName': document.getElementById('nomeLivro').value
@@ -14,7 +16,9 @@ function newBookRequest() {
 	.done(function(result){     // on success get the return object from server
 	    console.log(result)     // do whatever with it. In this case see it in console
 	    if (result == 'ok') {
-	    	$('#modalNovoLivro').modal('close');
+			window.openedBook = book['bookName']
+			$('#modalNovoLivro').modal('close');
+			document.getElementById('errorResult').innerHTML = ""
 		    document.getElementById('book-name').innerHTML = document.getElementById('nomeLivro').value;
 		    console.log('Deletando todos os capitulos')
 		    deleteAll();
@@ -22,7 +26,10 @@ function newBookRequest() {
 		    addCap("intro");
 		    console.log(capitulos)
 		    console.log("mudando para o capitulo intro")
-		    changeCap(0);
+			selectCap(0);
+			addSes()
+			selectSes(0)
+			saveBook()
 		}
 		else if (result == 'already exist'){
 			document.getElementById('errorResult').innerHTML = "Erro: Nome já está em uso."
@@ -34,4 +41,10 @@ function deleteAll() {
 	document.getElementById('capList').innerHTML = ''
 	capitulos = {};
 	totalCapnum = 0;
+}
+
+function openModalDetection() {
+	if ($('#modalNovoLivro').hasClass('open') === false) {
+		document.getElementById('errorResult').innerHTML = "";
+	}
 }

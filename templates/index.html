@@ -2,20 +2,32 @@
 <html>
 
 <head>
-	<title>Escritor</title>
+	<title>Booker</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<!-- Materialize content -->
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+	<!-- Favicon -->
+	<link rel="shortcut icon" href="{{url_for('static',filename='mymaterial/ico/booker.ico')}}" />
+
+	<!-- Materialize JS -->
 	<script src="{{url_for('static',filename='materialize/js/jquery-3.4.1.min.js')}}"></script>
 	<script src="{{url_for('static',filename='materialize/js/materialize.js')}}"></script>
+	<!-- Materialize css -->
+	<link rel="stylesheet" href="{{url_for('static',filename='materialize/css/materialize.css')}}">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">	
+
+	<!-- My Material JS-->
+	<script src="{{url_for('static',filename='mymaterial/js/bookManager.js')}}"></script>
+	<script src="{{url_for('static',filename='mymaterial/js/notCloseServerRequest.js')}}"></script>
 	<script src="{{url_for('static',filename='mymaterial/js/dropdown.js')}}"></script>
 	<script src="{{url_for('static',filename='mymaterial/js/saveRequest.js')}}"></script>
 	<script src="{{url_for('static',filename='mymaterial/js/newBookRequest.js')}}"></script>
 	<script src="{{url_for('static',filename='mymaterial/js/capManager.js')}}"></script>
+	<script src="{{url_for('static',filename='mymaterial/js/sessionManager.js')}}"></script>
 	<script src="{{url_for('static',filename='mymaterial/js/openPage.js')}}"></script>
+	<script src="{{url_for('static',filename='mymaterial/js/closing.js')}}"></script>
 	<script src="{{url_for('static',filename='mymaterial/js/shortcuts.js')}}"></script>
-	<link rel="stylesheet" href="{{url_for('static',filename='materialize/css/materialize.css')}}">
+	<!-- My Material css-->
 	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='mymaterial/css/index.css')}}">
 </head>
 
@@ -26,15 +38,30 @@
 	<div class="row ">
 		<div class="row" style="margin-left:1%">
 		<!-- Arquivo dropdown -->
-		  <a class='dropdown-trigger btn' href='#' data-target="arquivo">Alterar arquivo</a>
-		  <ul id='arquivo' class='dropdown-content'>
-		    <li><a onClick="openBook()" href="#!">Abrir livro</a></li>
-		    <!-- Novo livro modal -->
-		    <li><a class="modal-trigger" href="#modalNovoLivro">Novo livro</a></li>	    
-		    <li><a onClick="saveBook()">Salvar livro</a></li>
-		    <li><a href="#!">Exportar livro</a></li>
-		    <li class="divider" tabindex="-1"></li>
-		  </ul>
+		  	<a class='dropdown-trigger btn' href='#' data-target="arquivo">Alterar arquivo</a>
+			<ul id='arquivo' class='dropdown-content'>
+				<li><a onClick="openBook()" href="#!">Abrir livro</a></li>
+				<!-- Novo livro modal -->
+				<li><a class="modal-trigger" href="#modalNovoLivro">Novo livro</a></li>	    
+				<li><a onClick="saveBook()">Salvar livro</a></li>
+				<li><a href="#!">Exportar livro</a></li>
+				<li class="divider" tabindex="-1"></li>
+			</ul>
+			
+		<!-- opções dropdown -->
+			<a class='dropdown-trigger btn' href="#" data-target="settings">Configuração</a>
+			<ul id='settings' class='dropdown-content'>
+				<li class="divider" tabindex="2"></li>
+				<div onclick="autoSaveCheckBox()">
+					<li style="padding-top: 1.4vh; padding-left:0.4em">
+						<label style="color:#26a69a" onclick=return(false)>
+							<input id="autoSaveCheckBoxInput" type="checkbox" class="filled-in"/>
+							<span style="color:#26a69a; padding-left:1.8em;">Autosave</span>
+						</label>
+					</li>
+				</div>
+			</ul>
+
 		  <!-- Editar dropdown --> 
 		 <!--  <a class='dropdown-trigger btn' href='#' data-target="editar">Editar livro</a>
 		  <ul id='editar' class='dropdown-content'>
@@ -48,25 +75,25 @@
 		  <!-- Ajuda dropdown -->
 		  <a class='dropdown-trigger btn' href='#' data-target="ajuda">Ajuda</a>
 		  <ul id='ajuda' class='dropdown-content'>
-		    <li><a href="#modalHelp" class="modal-trigger">Socorro</a></li>
+		   	<li><a href="#modalHelp" class="modal-trigger">Socorro</a></li>
 		    <li class="divider" tabindex="-1"></li>
 		    <li><a href="#modalAbout" class="modal-trigger">Sobre</a></li>
 		  </ul>
 
 		</div>
 	</div>
-
-	<div class="row">
+	<!-- Titulo do livro-->
+	<div class="row" id="bookTitle" style="visibility: hidden;">
 				Livro:<h4 id="book-name"></h4>
 			</div>
 
 	<!--Normal content-->
-	<div class="row flex">
-
-		<!-- SideBar -->
-		<div class="col s0 m3 l2 hide-on-small-only "> <!-- sidebar hide on mobile -->
-			<!-- Nome do livro -->
-
+	<div class="row ">
+		<div id="initialTitle">
+			<h3 style="text-align:center;margin-top:20vh;" > Bem vindo! <br>Abra ou crie um novo livro</h3>
+		</div>
+		<!-- SideBar Capitulos -->
+		<div class="col s0 m3 l2 offset hide-on-small-only " id="capLine" style="visibility: hidden;"> <!-- sidebar hide on mobile -->
 			<!-- Titulo da sidebar -->
 			<div class="row">
 				<h5>Capitulos</h5>
@@ -74,37 +101,48 @@
 			<!--  Botões do capitulo -->
 			<div class="row">
 				<!-- Botão de adicionar capitulo -->
-				<a href="#!" onClick=" addCap()" class="waves-effect waves-light btn blue darken-3"><i class="material-icons">add</i></a>
-
-				<!-- Botão de editar capitulo -->
-				<!-- <a href="#!" onClick="alterCap()" class="waves-effect green-light green btn"><i class="material-icons">border_color</i></a> -->
-
+				<a href="#!" onClick=" addCap()" class="waves-effect waves-light btn-small blue darken-3"><i style="color:white" class="small material-icons">add</i></a>
 				<!-- Botão de Remover capitulo -->
-				<a href="#!" onClick="removeCap()" class="waves-effect red-light red btn"><i class="material-icons">remove</i></a>
-
-				
+				<a href="#!" onClick="removeCap('last')" class="waves-effect red-light red btn-small"><i style="color:white" class="small material-icons">remove</i></a>			
 			</div>
 
 			<!-- Capitulos da sidebar -->
-			<div class="row" id="capList">
-				
-
+			<div class="row" id="capList">				
 			</div>
+		</div>
+		<!-- SideBar Sessão -->
+		<div class="col s0 m2 l1 hide-on-small-only" id="sessionLine"style="visibility: hidden;"> <!-- sidebar hide on mobile -->
 
+			<!-- Titulo da sidebar -->
+			<div class="row">
+				Sessões
+			</div>
+			<!--  Botões da sessão -->
+			<div class="row" >
+				<!-- Botão de adicionar sessão -->
+				<div href="#!" style="max-height:1.3em;min-width:2em;text-align:center;" onClick=" addSes()" class="waves-effect waves-light btn-tiny cyan darken-3"><i style="color:white" class="tiny material-icons">add</i></div>
+				<!-- Botão de editar sessão -->
+				<!-- <a href="#!" onClick="alterCap()" class="waves-effect green-light green btn"><i class="material-icons">border_color</i></a> -->
+				<!-- Botão de Remover sessão -->
+				<div href="#!" style="max-height:1.3em;min-width:2em;text-align:center;" onClick="removeSes('last')" class="waves-effect btn-tiny orange darken-3"><i style="color:white" class="tiny material-icons">remove</i></div>				
+			</div>
+			<!-- Capitulos da sidebar -->
+			<div class="row" id="sesList">
+			</div>
 		</div>
 
 		<!-- Escrever -->
-		<div class="col s12 m9 l10"> 
+		<div class="col s12 m6 l8" id="escrever"> 
 			<div class="col s1 m0 l0 blue push-s10 row hide-on-med-and-up" > 1 </div> 
 			
-			<!-- Titulo do capitulo -->
+			<!-- Titulo da sessão -->
 			<div class="col s12">
-					<input class="title-text" id="capTitle" type="text" data-length="10">
+					<input class="title-text" id="sesTitle" type="text" data-length="10">
          		    <label for="input_text">Titulo do capitulo</label>
 			</div>
-			<!-- Texto do capitulo -->
+			<!-- Texto da sessão -->
 			<div class="col s11">
-				<textarea id="capContent" class="materialize-textarea" text="white"></textarea>
+				<textarea id="sesContent" class="materialize-textarea" text="white"></textarea>
 			</div>
 		</div>
 
@@ -112,7 +150,7 @@
 
 </main>
 
-	<footer class="page-footer">
+	<footer class="page-footer" style="visibility: hidden;">
 		<div class="container">
 			<div class="row">
 				<div class="col s12"> Rodapé aqui. </div>
@@ -173,9 +211,10 @@
 	    <div class="modal-content">
 	      <h4>Sobre</h4><br>
 	       <div class="input-field col s6">
-	          <p class='white-text'>Nome: Software escritor</p>
+	          <p class='white-text'>Nome: Booker</p>
 	          <p class='white-text'>Descrição: Software Para escrever livros</p>
-	          <p class='white-text'>Versão: 0.1</p>
+			  <p class='white-text'>Versão: 0.2</p>
+			  <p class='white-text'>Ultimas novidades: <a href onclick="openUpdateNotes()">Abrir notas de atualização</a></p>
 
         	</div>
 	    </div>
@@ -183,6 +222,61 @@
 	    	<a id="errorResult"></a>
 	      <a onClick="newBookRequest()" href="#!" class="modal-close white-text waves-effect waves-green btn-flat">Fechar</a>
 	    </div>
+	</div>
+
+	<!-- Modal para alterar nome do capitulo do livro -->
+	<div id="modalAlterarCapitulo" class="modal">
+	    <div class="modal-content">
+		  <h4>Alterar titulo do capitulo</h4>
+		  <br><br>
+		  <div class="input-field col s6">
+			<input placeholder="Digite o nome do capítulo" style="color:white" id="capName" type="text" class="validate">
+			<label for="first_name">Nome do capitulo</label>
+		  </div>
+	    </div>
+	    <div class="modal-footer">
+	    	<a id="errorResult"></a>
+	      <a onClick="alterCapName()" href="#!" class=" white-text waves-effect waves-green green green-light btn-flat">Alterar capitulo</a>
+	    </div>
+	</div>
+
+	<!-- Modal para confirmar o delete do capitulo -->
+	<div id="modalDeleteCapitulo" class="modal">
+	    <div class="modal-content">
+		  <h4>Deseja mesmo apagar o capítulo?</h4>
+		  <br><br>
+		  <h5 style="color:red">Atenção: deletar não pode ser desfeito, e todas as sessões serão perdidas para sempre</h5>
+	    </div>
+	    <div class="modal-footer">
+	    	<a id="errorResult"></a>
+	      <a onClick="removeCap()" href="#!" class=" white-text waves-effect waves-green green green-light btn-flat">Apagar capitulo</a>
+	    </div>
+	</div>
+
+	<!-- Modal para confirmar o delete da sessão-->
+	<div id="modalDeleteCapitulo" class="modal">
+	    <div class="modal-content">
+		  <h4>Deseja mesmo apagar a sessão?</h4>
+		  <br><br>
+		  <h5 style="color:red">Atenção: deletar não pode ser desfeito, e a sessão será perdida para sempre</h5>
+	    </div>
+	    <div class="modal-footer">
+	    	<a id="errorResult"></a>
+	      <a onClick="removeSession()" href="#!" class=" white-text waves-effect waves-green green green-light btn-flat">Apagar sessão</a>
+	    </div>
+	</div>
+
+	<!-- Modal para confirmar o delete do livro -->
+	<div id="modalDeleteBook" class="modal">
+		<div class="modal-content">
+			<h4>Deseja mesmo apagar o livro?</h4>
+			<br><br>
+			<h5 style="color:red">Atenção: deletar não pode ser desfeito, e todo o conteúdo do livro será perdido para sempre</h5>
+		</div>
+		<div class="modal-footer">
+			<a id="errorResult"></a>
+			<a onClick="deleteBook()" href="#!" class=" white-text waves-effect waves-green green green-light btn-flat">Apagar livro</a>
+		</div>
 	</div>
 
 </body>
